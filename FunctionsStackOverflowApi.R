@@ -46,9 +46,9 @@ get_stackoverflow_data = function (query_string){
 
   #while (length(my_data$items) > 0) {
   repeat {
-    
+    Sys.sleep(0.2)
     print(paste("page number: ", page_number, " items: ", page_number*30, " out of ", content_total$total, sep = '', collapse = ''))
-
+                            
     for (outerloop in 1:(length(my_data$items))) {
 
       for (tagloop in 1: (length(my_data$items[[outerloop]]$tags)))

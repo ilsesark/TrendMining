@@ -34,7 +34,7 @@ getoldtweets_path = paste(getwd(),"/GetOldTweets-java-master", sep="")
 #** https://dev.elsevier.com/user/login
 #** Replace the next line with set_api_key("YOUR_SCOPUS_KEY_HERE")
 #** EDIT THE FOLLOWING LINE with YOUR OWN Scopus API key
-install.packages("rscopus", dependencies = TRUE)
+#install.packages("rscopus", dependencies = TRUE)
 library("rscopus")
 #set_api_key("")
 #alternatively you may store it a personal file somewhere else. 
