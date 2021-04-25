@@ -1,13 +1,14 @@
-#install.packages("tm", dependencies = TRUE)
-#install.packages("NLP", dependencies = TRUE)
-#install.packages("magrittr", dependencies = TRUE)
-#install.packages("slam", dependencies = TRUE)
-#install.packages("Rmpfr", dependencies = TRUE)
+install.packages("tm", dependencies = TRUE)
+install.packages("NLP", dependencies = TRUE)
+install.packages("magrittr", dependencies = TRUE)
+install.packages("slam", dependencies = TRUE)
+install.packages("Rmpfr", dependencies = TRUE)
+install.packages("tokenizers", dependencies = TRUE)
 library(tm)
-#library(NLP)
-#library(magrittr)
-#library(slam)
-#library(Rmpfr)
+library(NLP)
+library(magrittr)
+library(slam)
+library(Rmpfr)
 
 library("magrittr")
 library("text2vec")
@@ -16,13 +17,20 @@ library("tokenizers")
 #source ("mclapply.hack.R")
 
 #Set the file to be analyzed, e.g.
-my_file = "my_Scopus_TSE_articles_clean_data.RData"
+#FOR SCOPUS DATA
+my_file = "my_Scopus_devops_data.RData"
+#FOR STO DATA
+my_file = "my_STO_devops_data.RData"
 
 my_temp_file = paste(my_data_dir, "/", sep="")
 my_temp_file = paste(my_temp_file, my_file, sep="")
 load(my_temp_file)
 
-my_stopwords = c(stopwords::stopwords(language = "en", source = "snowball"),"myStopword1", "myStopword2")
+#FOR SCOPUS DATA
+my_stopwords = c(stopwords::stopwords(language = "en", source = "snowball"),"also", "can", "however", "use", "used")
+
+#FOR STO DATA
+my_stopwords = c(stopwords::stopwords(language = "en", source = "snowball"),"able", "want", "can", "one", "like", "also", "just")
 
 #Articles with NA dates cause false analysis later kick them out
 my_articles <- my_articles[which(!is.na(my_articles$Date)),]
@@ -48,7 +56,7 @@ vectorizer = vocab_vectorizer(v)
 dtm = create_dtm(it, vectorizer, type = "dgTMatrix")
 
 # we create 10 topics 
-lda_model = LDA$new(n_topics = 10, doc_topic_prior = 0.1, topic_word_prior = 0.01)
+lda_model = LDA$new(n_topics = 50, doc_topic_prior = 0.936788, topic_word_prior = 0.002461)
 doc_topic_distr = lda_model$fit_transform(x = dtm, n_iter = 1000, 
                           convergence_tol = 0.001, n_check_convergence = 25, 
                           #convergence_tol = 0.01, n_check_convergence = 25, 
@@ -71,7 +79,7 @@ lda_model$get_top_words(n = 7, topic_number = c(1:10), lambda = 0.3)
 # to find the best but relatively good). See for more detailshttps://cran.r-project.org/web/packages/DEoptim/index.html
 #Evaluate function optimalLda at the end of this file. Then 
 
-
+install.packages("DEoptim")
 
 library(DEoptim)
 #Search space needs to be defined topics are between 10-500 and hyberparameters are between 0 and 1
@@ -88,12 +96,15 @@ DEoptim(optimalLda, lower, higher, DEoptim.control(strategy = 2, itermax = 10, N
 
 #297.9555 0.2518732 0.005613016
 
+# BEST VALUES FOR SCOPUS DATA score 145.532435 bestmemit:  491.674085    0.936788    0.002461
+# BEST VALUES FOR STO DATA score 222.993079 bestmemit:  421.452607    0.807019    0.054026
+
 tokens = my_articles$Clean_Text %>%  tokenize_words (strip_numeric = TRUE)
 it <- itoken(tokens, progressbar = FALSE)
 v = create_vocabulary(it) %>% prune_vocabulary(term_count_min = 10, doc_proportion_max = 0.3)
 vectorizer = vocab_vectorizer(v)
 dtm = create_dtm(it, vectorizer, type = "dgTMatrix")
-lda_model = LDA$new(n_topics = 298, doc_topic_prior = 0.2518732, topic_word_prior = 0.005613016)
+lda_model = LDA$new(n_topics = 50, doc_topic_prior = 0.936788, topic_word_prior = 0.002461)
 doc_topic_distr = lda_model$fit_transform(x = dtm, n_iter = 1000, 
                                           convergence_tol = 0.001, n_check_convergence = 25, 
                                           #convergence_tol = 0.01, n_check_convergence = 25, 
@@ -152,3 +163,4 @@ optimalLda <- function (x){
   print(paste("k:", m_k, "alpha:", m_alpha, "beta", m_beta, "perp:", perp))
   perp
 }
+

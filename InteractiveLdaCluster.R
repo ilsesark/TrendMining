@@ -1,14 +1,18 @@
-#install.packages("text2vec", dependencies=TRUE)
-#install.packages("tm", dependencies=TRUE)
-#install.packages("magrittr", dependencies=TRUE)
-#install.packages("LDAvis")
+install.packages("text2vec", dependencies=TRUE)
+install.packages("tm", dependencies=TRUE)
+install.packages("magrittr", dependencies=TRUE)
+install.packages("LDAvis")
 library(text2vec)
 library(tm)
 library(magrittr)
 library(LDAvis)
 
 #May take a while - wait patiently
-my_file = "my_Scopus_TSE_articles_clean_data.RData"
+
+#FOR SCOPUS DATA
+my_file = "my_Scopus_devops_data.RData"
+#FOR STO DATA
+my_file = "my_STO_devops_data.RData"
 #draw_my_IAMap = function(my_file) {
   
   print(paste("Interactive LDA Cluster, my_file: ", my_file))
@@ -25,8 +29,11 @@ my_file = "my_Scopus_TSE_articles_clean_data.RData"
   
   it = itoken(my_tokens)
   
-  my_stopwords = c(stopwords::stopwords(language = "en", source = "snowball"),"myStopword1", "myStopword2")
+  #FOR SCOPUS DATA
+  my_stopwords = c(stopwords::stopwords(language = "en", source = "snowball"),"also", "can", "however", "use", "used")
   
+  #FOR STO DATA
+  my_stopwords = c(stopwords::stopwords(language = "en", source = "snowball"),"able", "want", "can", "one", "like", "also", "just")
   
   #Remove stopwords
   my_vocab <- create_vocabulary(it, stopwords=my_stopwords)
@@ -35,7 +42,7 @@ my_file = "my_Scopus_TSE_articles_clean_data.RData"
   #Each word is only allowed to appear in 50% of the documents
   #vocab <- prune_vocabulary(vocab, max_number_of_terms=40000, doc_proportion_max=0.5)
   my_vocab <- prune_vocabulary(my_vocab,
-                               term_count_min=10,
+                               term_count_min=200,
                                vocab_term_max=40000, 
                                doc_proportion_max=0.5)
 
